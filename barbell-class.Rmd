@@ -102,10 +102,10 @@ error_rate = 1 - result_matrix$overall[1]
 
 Applying this model to the validtion set shows an error rate of `r error_rate` We predict the test set will be similar. Here is the confusion matrix of the results
 
-`r result_matrix$table `
 
-
-
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+result_matrix
+```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # The moment of truth. Predict the test set
@@ -127,10 +127,11 @@ fit2 = train(classe ~ ., data=training, method="rf")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 predictions = predict(fit2, validation)
 results = confusionMatrix(predictions, validation_class)
+results
 ```
 With this new model, we've lowered our error rate to `r 1 - results$overall[1]`. We predict similar error rates for the test data. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
   test_results = predict(fit2, testing)
   for(i in 1:20) {
     file_name = paste("Answers/result_", i, ".txt", sep="")  

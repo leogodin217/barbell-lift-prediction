@@ -74,9 +74,43 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>We used cross validation in the analysis, splitting training data into two datasets, train=15699 rows and validation=3923 rows. We used the cross validation set to predict the error of the test set and in generalized use beyond this specific data set.</p>
 <p>one goal of this analysis is to provide accuracy and performance. As such, we want the most accurate model that can be trained as quickly as possible. We used PCA (principal component analysis) to reduce the number of features while retaining 95% of the variability. We also normalized the training data. This brought us from 53 features to 25 features</p>
 <p>Applying this model to the validtion set shows an error rate of 0.1899057 We predict the test set will be similar. Here is the confusion matrix of the results</p>
-<p>976, 22, 46, 70, 2, 84, 580, 70, 10, 15, 48, 48, 558, 19, 11, 33, 10, 77, 514, 9, 24, 71, 48, 28, 550</p>
 <p>With the test set, we achieved a 15% error rate which is similar to the prediction. One possible problem could be with uing PCA before training with GBM. We will try the same model fit without using PCA first and use a Random Forest instead of boosting.</p>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1115    6    0    0    0
+##          B    1  751    1    0    0
+##          C    0    2  681    6    2
+##          D    0    0    2  636    7
+##          E    0    0    0    1  712
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9929          
+##                  95% CI : (0.9897, 0.9953)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.991           
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9991   0.9895   0.9956   0.9891   0.9875
+## Specificity            0.9979   0.9994   0.9969   0.9973   0.9997
+## Pos Pred Value         0.9946   0.9973   0.9855   0.9860   0.9986
+## Neg Pred Value         0.9996   0.9975   0.9991   0.9979   0.9972
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2842   0.1914   0.1736   0.1621   0.1815
+## Detection Prevalence   0.2858   0.1919   0.1761   0.1644   0.1817
+## Balanced Accuracy      0.9985   0.9944   0.9963   0.9932   0.9936</code></pre>
 <p>With this new model, we’ve lowered our error rate to 0.0071374. We predict similar error rates for the test data.</p>
+<pre><code>## Loading required package: randomForest</code></pre>
+<pre><code>## Warning: package 'randomForest' was built under R version 3.1.2</code></pre>
+<pre><code>## randomForest 4.6-10
+## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 </div>
 
 
