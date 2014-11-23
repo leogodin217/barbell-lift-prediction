@@ -1,0 +1,140 @@
+---
+title: "barbell-lifts"
+author: "Leo Godin"
+date: "Friday, November 21, 2014"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
+#library(dplyr)
+library(caret)
+library(ggplot2)
+library(data.table)
+```
+
+### Data
+First, we looked at data quality. In particular we deemed columns with fewer than 80% valid entries as unreliable. Using "#DIV/0!", blank entries and "NA" as invalid entries, sixty out of one-hundred-sixty columns contained greater than 80% valid entries. These columns were used in the analysis.  Also, we want this model to be generalized, so we will remove username as a predictor. 
+
+We removed columns that are not needed or would make our results less generalized
+
+* Columns with fewer than 80% valid data (NA, #DIV/0! and blank)
+* X, which is an index
+* user_name (We want the model to be generalized to other users)
+* raw_timestamp_part_1 (not needed as it tells when the rep started, raw_timestamp_part_2 is useful as it shows where in a repitition we are)
+* cvtd_timestamp (not significant, as we don't care when the repitition was started)
+* new_window (not needed, as raw_timestamp_part_2 gives us the time in a repitition)
+* num_window (not needed, unless we are analyzing a specific repitition)
+
+
+
+```{r cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+# Set the seed so we have reproducible results
+set.seed(95443)
+# Input needed functions
+# Get the data
+train_url  = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_url   = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+train_file = "data/train.csv"
+test_file  = "data/test.csv"
+
+#download.file(train_url, destfile=train_file)
+#download.file(test_url, destfile=test_file)
+
+#train = read.csv(train_file, na.strings=c("#DIV/0!", "", "NA"))
+#test = read.csv(test_file, na.strings=c("#DIV/0!", "", "NA"))
+
+# Get the columns that are valid and needed
+valid_entries = !is.na(train)
+entry_threshold = .8 * dim(train)[1] # Need at least 80% valid entries
+columns = colSums(valid_entries) > entry_threshold
+# Pull out the names
+valid_columns = colSums(valid_entries) > entry_threshold
+# Columns 1, 2, 3, 5, 6 are not needed. Column 3 tells how far into a rep we are
+valid_columns[1:3] = FALSE
+valid_columns[5:7] = FALSE
+
+valid_train = train[,valid_columns]
+testing  = test[,valid_columns]
+
+
+
+
+# Separate out cross-validation set
+train_rows = createDataPartition(valid_train$classe, p=.8, list=FALSE)
+training = valid_train[train_rows,]
+validation = valid_train[-train_rows,]
+
+# For PCA we need to separate out classe from the features
+training_class = training$classe
+training = training[,-dim(training)[2]]
+validation_class = validation$classe
+validation = validation[,-dim(validation)[2]]
+test_class = testing$classe
+testing = testing[,-dim(testing)[2]]
+```
+
+We used cross validation in the analysis, splitting training data into two datasets, train=`r dim(training)[1]` rows and validation=`r dim(validation)[1]` rows. We used the cross validation set to predict the error of the test set and in generalized use beyond this specific data set. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Perform PCA and 
+pca = preProcess(training, method=c("pca", "center", "scale"), thresh=.95)
+training_pca   = predict(pca, training)
+training_pca$classe = training_class
+validation_pca = predict(pca, validation)
+testing_pca    = predict(pca, testing)
+```
+
+one goal of this analysis is to provide accuracy and performance. As such, we want the most accurate model that can be trained as quickly as possible. We used PCA (principal component analysis) to reduce the number of features while retaining 95% of the variability. We also normalized the training data. This brought us from `r dim(training)[2]` features to `r pca$numComp` features
+
+```{r echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
+# Train the model
+# Add the class back to training_pca
+fit = train(classe ~ ., data=training_pca, method="gbm", verbose=FALSE) 
+
+predict_validation = predict(fit, validation_pca)
+result_matrix = confusionMatrix(predict_validation, validation_class)
+
+# Get the accuracy
+error_rate = 1 - result_matrix$overall[1]
+
+```
+
+Applying this model to the validtion set shows an error rate of `r error_rate` We predict the test set will be similar. Here is the confusion matrix of the results
+
+`r result_matrix$table `
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# The moment of truth. Predict the test set
+  test_results = predict(fit, testing_pca)
+  for(i in 1:20) {
+    file_name = paste("Answers/result_", i, ".txt", sep="")  
+    write.table(test_results[i], file=file_name, quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+  
+```
+
+With the test set, we achieved a 15% error rate which is similar to the prediction. One possible problem could be with uing PCA before training with GBM. We will try the same model fit without using PCA first and use a Random Forest instead of boosting. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+training$classe = training_class
+fit2 = train(classe ~ ., data=training, method="rf")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+predictions = predict(fit2, validation)
+results = confusionMatrix(predictions, validation_class)
+```
+With this new model, we've lowered our error rate to `r 1 - results$overall[1]`. We predict similar error rates for the test data. 
+
+```{r, echo=FALSE}
+  test_results = predict(fit2, testing)
+  for(i in 1:20) {
+    file_name = paste("Answers/result_", i, ".txt", sep="")  
+    write.table(test_results[i], file=file_name, quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+```
+
