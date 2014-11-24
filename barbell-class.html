@@ -74,6 +74,37 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>We used cross validation in the analysis, splitting training data into two datasets, train=15699 rows and validation=3923 rows. We used the cross validation set to predict the error of the test set and in generalized use beyond this specific data set.</p>
 <p>one goal of this analysis is to provide accuracy and performance. As such, we want the most accurate model that can be trained as quickly as possible. We used PCA (principal component analysis) to reduce the number of features while retaining 95% of the variability. We also normalized the training data. This brought us from 53 features to 25 features</p>
 <p>Applying this model to the validtion set shows an error rate of 0.1899057 We predict the test set will be similar. Here is the confusion matrix of the results</p>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   A   B   C   D   E
+##          A 976  84  48  33  24
+##          B  22 580  48  10  71
+##          C  46  70 558  77  48
+##          D  70  10  19 514  28
+##          E   2  15  11   9 550
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.8101          
+##                  95% CI : (0.7975, 0.8223)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.7595          
+##  Mcnemar's Test P-Value : &lt; 2.2e-16       
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.8746   0.7642   0.8158   0.7994   0.7628
+## Specificity            0.9327   0.9523   0.9256   0.9613   0.9884
+## Pos Pred Value         0.8378   0.7934   0.6984   0.8019   0.9370
+## Neg Pred Value         0.9492   0.9439   0.9597   0.9607   0.9487
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2488   0.1478   0.1422   0.1310   0.1402
+## Detection Prevalence   0.2970   0.1863   0.2037   0.1634   0.1496
+## Balanced Accuracy      0.9036   0.8582   0.8707   0.8803   0.8756</code></pre>
 <p>With the test set, we achieved a 15% error rate which is similar to the prediction. One possible problem could be with uing PCA before training with GBM. We will try the same model fit without using PCA first and use a Random Forest instead of boosting.</p>
 <pre><code>## Confusion Matrix and Statistics
 ## 
@@ -81,36 +112,32 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 ## Prediction    A    B    C    D    E
 ##          A 1115    6    0    0    0
 ##          B    1  751    1    0    0
-##          C    0    2  681    6    2
-##          D    0    0    2  636    7
+##          C    0    2  681    5    2
+##          D    0    0    2  637    7
 ##          E    0    0    0    1  712
 ## 
 ## Overall Statistics
-##                                           
-##                Accuracy : 0.9929          
-##                  95% CI : (0.9897, 0.9953)
-##     No Information Rate : 0.2845          
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-##                                           
-##                   Kappa : 0.991           
-##  Mcnemar's Test P-Value : NA              
+##                                         
+##                Accuracy : 0.9931        
+##                  95% CI : (0.99, 0.9955)
+##     No Information Rate : 0.2845        
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16     
+##                                         
+##                   Kappa : 0.9913        
+##  Mcnemar's Test P-Value : NA            
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9991   0.9895   0.9956   0.9891   0.9875
-## Specificity            0.9979   0.9994   0.9969   0.9973   0.9997
-## Pos Pred Value         0.9946   0.9973   0.9855   0.9860   0.9986
-## Neg Pred Value         0.9996   0.9975   0.9991   0.9979   0.9972
+## Sensitivity            0.9991   0.9895   0.9956   0.9907   0.9875
+## Specificity            0.9979   0.9994   0.9972   0.9973   0.9997
+## Pos Pred Value         0.9946   0.9973   0.9870   0.9861   0.9986
+## Neg Pred Value         0.9996   0.9975   0.9991   0.9982   0.9972
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2842   0.1914   0.1736   0.1621   0.1815
-## Detection Prevalence   0.2858   0.1919   0.1761   0.1644   0.1817
-## Balanced Accuracy      0.9985   0.9944   0.9963   0.9932   0.9936</code></pre>
-<p>With this new model, we’ve lowered our error rate to 0.0071374. We predict similar error rates for the test data.</p>
-<pre><code>## Loading required package: randomForest</code></pre>
-<pre><code>## Warning: package 'randomForest' was built under R version 3.1.2</code></pre>
-<pre><code>## randomForest 4.6-10
-## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+## Detection Rate         0.2842   0.1914   0.1736   0.1624   0.1815
+## Detection Prevalence   0.2858   0.1919   0.1759   0.1647   0.1817
+## Balanced Accuracy      0.9985   0.9944   0.9964   0.9940   0.9936</code></pre>
+<p>With this new model, we’ve lowered our error rate to 0.0068825. We predict similar error rates for the test data.</p>
 </div>
 
 
