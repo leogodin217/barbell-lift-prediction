@@ -58,6 +58,10 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 
 
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<p>This project aims to predict quality of barbell lifts using data from a fitness tracker. In this study, we analyzed various movements from the fitness trackers using random forests to determine correctness of the exercise. Data for this project can be found her: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>.</p>
+</div>
 <div id="data" class="section level3">
 <h3>Data</h3>
 <p>First, we looked at data quality. In particular we deemed columns with fewer than 80% valid entries as unreliable. Using “#DIV/0!”, blank entries and “NA” as invalid entries, sixty out of one-hundred-sixty columns contained greater than 80% valid entries. These columns were used in the analysis. Also, we want this model to be generalized, so we will remove username as a predictor.</p>
@@ -71,8 +75,14 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <li>new_window (not needed, as raw_timestamp_part_2 gives us the time in a repitition)</li>
 <li>num_window (not needed, unless we are analyzing a specific repitition)</li>
 </ul>
+</div>
+<div id="methodology" class="section level3">
+<h3>Methodology</h3>
 <p>We used cross validation in the analysis, splitting training data into two datasets, train=15699 rows and validation=3923 rows. We used the cross validation set to predict the error of the test set and in generalized use beyond this specific data set.</p>
 <p>one goal of this analysis is to provide accuracy and performance. As such, we want the most accurate model that can be trained as quickly as possible. We used PCA (principal component analysis) to reduce the number of features while retaining 95% of the variability. We also normalized the training data. This brought us from 53 features to 25 features</p>
+</div>
+<div id="results" class="section level3">
+<h3>Results</h3>
 <p>Applying this model to the validtion set shows an error rate of 0.1899057 We predict the test set will be similar. Here is the confusion matrix of the results</p>
 <pre><code>## Confusion Matrix and Statistics
 ## 
@@ -137,7 +147,10 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 ## Detection Rate         0.2842   0.1914   0.1736   0.1624   0.1815
 ## Detection Prevalence   0.2858   0.1919   0.1759   0.1647   0.1817
 ## Balanced Accuracy      0.9985   0.9944   0.9964   0.9940   0.9936</code></pre>
-<p>With this new model, we’ve lowered our error rate to 0.0068825. We predict similar error rates for the test data.</p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>With this new model, we’ve lowered our error rate to 0.0068825. We predict similar error rates for the test data. After submitting the test results, we acheived 0% errors and have concluded that this model gives a good prediction</p>
 </div>
 
 
